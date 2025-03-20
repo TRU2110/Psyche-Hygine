@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #000000;
+            text-align: center;
+        }
+        .blue{
+            color:#007bff;
+        }
+        #controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        label{
+            margin-top: 10px;
+        }
+        .date-search {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        #appointment-container {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #a7cbf8;
+            color: #000000;
+        }
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #3f3f3f;
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <h1 class="heading"><span class="blue">'</span> Appointment Schedule <span class="blue">'</span></h1>
+
+
+    <div id="controls">
+        <button class="btn" onclick="goToHome()">Home</button>
+        <div class="date-search">
+            <label for="date">Select Date:</label>
+            <input type="date" id="date" class="date-input">
+            <button class="btn" onclick="fetchAppointments()">Search</button>
+        </div>
+    </div>
+
+    <div id="appointment-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Appointment Date</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody id="appointment-list">
+                <!-- Appointments will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function goToHome() {
+            window.location.href = 'index.html'; // Update this path if your home page is located elsewhere
+        }
+        async function fetchAppointments() {
+            const selectedDate = document.getElementById('date').value;
+            const response = await fetch('http://localhost:5000/appointments'); 
+            const data = await response.json();
+
+            const filteredAppointments = data.filter(appointment =>
+                appointment.appointment_date === selectedDate
+            );
+
+            const tableBody = document.getElementById('appointment-list');
+            tableBody.innerHTML = '';  // Clear previous data
+
+            if (filteredAppointments.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6">No appointments found for the selected date.</td></tr>`;
+            } else {
+                filteredAppointments.forEach(appointment => {
+                    const row = `
+                        <tr>
+                            <td>${appointment.id}</td>
+                            <td>${appointment.full_name}</td>
+                            <td>${appointment.phone_number}</td>
+                            <td>${appointment.email}</td>
+                            <td>${appointment.appointment_date}</td>
+                            <td>${appointment.message || '-'}</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
